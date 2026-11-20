@@ -1,0 +1,93 @@
+TRABALHO 2 - CLASSIFICANDO AS REPRESENTACOES (kNN)
+
+1. AUTORIA
+   Nome: Maria Victoria Aviles
+
+2. ARQUIVOS DO PACOTE
+   mvac25/                diretorio principal
+   mvac25/LEIAME          este arquivo
+   mvac25/bin/            recebe o executavel "knn" depois do make
+   mvac25/src/            fontes e Makefile
+     Makefile            regras tudo, limpa e faxina
+     main.c              le a linha de comando e coordena a execucao
+     dataset.c / .h      leitura das bases de treino e teste
+     normaliza.c / .h    normalizacao Min-Max e Z-Score
+     knn.c / .h          distancia Euclidiana e classificador kNN
+
+3. COMO COMPILAR E EXECUTAR
+   Dentro de mvac25/src:
+     make tudo     compila e copia o executavel para mvac25/bin
+     make limpa    remove os arquivos objeto (*.o)
+     make faxina   remove tambem o executavel
+   A compilacao usa -Wall -Wextra -Wpedantic -std=c11 e nao gera warnings.
+   Como o programa usa sqrt(), o Makefile liga a biblioteca matematica (-lm).
+
+   Execucao (a partir de login/):
+     ./bin/knn -k 5 -t treino.txt -v teste.txt
+     ./bin/knn -k 5 -t treino.txt -v teste.txt -n min-max
+     ./bin/knn -k 5 -t treino.txt -v teste.txt -n z-score -d
+   -k  numero de vizinhos     -t  base de treino     -v  base de teste
+   -n  normalizacao (min-max ou z-score), opcional
+   -d  modo detalhado: imprime "nome: correta/incorreta" para cada imagem
+
+4. ALGORITMOS E ESTRUTURAS DE DADOS
+
+   4.1 Formato de entrada
+   Cada linha das bases tem:  nome_da_imagem valor_1 ... valor_n rotulo
+   O numero de valores por vetor e descoberto na primeira linha e todas as
+   outras devem ter o mesmo numero. Linhas em branco sao ignoradas.
+
+   4.2 Estrutura da base
+   Uma base e um unico bloco de doubles com todos os vetores, linha a linha
+   (atributo j da amostra i em valores[i * n_atributos + j]), mais um vetor
+   com o nome e o rotulo de cada amostra. Um unico bloco facilita alocar e
+   liberar a memoria e percorre a memoria em sequencia no calculo das
+   distancias. A leitura faz uma passagem so pelo arquivo e dobra a
+   capacidade quando ela acaba, entao nao precisa saber o tamanho antes.
+   Alternativa considerada: ler o arquivo duas vezes (contar e depois
+   preencher). Foi descartada por repetir o codigo de percorrer as linhas.
+
+   4.3 Rotulos e numero de classes
+   Os rotulos sao guardados como texto e comparados com strcmp. Assim o
+   programa funciona com qualquer rotulo (numeros ou nomes) e o numero de
+   classes nunca precisa ser informado: as classes sao as que aparecem nos
+   proprios vetores, e a votacao so considera os rotulos dos k vizinhos.
+
+   4.4 Normalizacao
+   Os dois metodos tem a forma (x - deslocamento) / escala:
+     Min-Max: deslocamento = minimo,  escala = maximo - minimo
+     Z-Score: deslocamento = media,   escala = desvio padrao
+   Quando a escala e zero o valor normalizado e zero, como pede o enunciado.
+   Os parametros sao calculados somente com a base de treino e aplicados
+   ao treino e ao teste. O desvio padrao usado e o populacional (divide
+   por N, nao por N - 1).
+
+   4.5 kNN
+   Para cada exemplo de teste calcula-se a distancia Euclidiana ate todos
+   os exemplos de treino, guardando apenas os k menores em um vetor de
+   tamanho k mantido ordenado (insercao ordenada, custo O(N * k) por
+   exemplo). Alternativa considerada: ordenar todas as N distancias com
+   qsort (O(N log N)); foi descartada por ser mais lenta e gastar memoria
+   com N distancias por exemplo de teste.
+   Votacao: vence o rotulo mais frequente entre os k vizinhos. Em caso de
+   empate vence o rotulo do vizinho mais proximo entre os empatados.
+   Se k for maior que o tamanho do treino, usa-se k = tamanho do treino.
+
+   4.6 Erros
+   Todas as alocacoes e aberturas de arquivo sao verificadas. Em qualquer
+   erro (arquivo ausente, linha mal formada, opcao invalida) o programa
+   escreve a causa em stderr, libera a memoria e termina com status 1.
+
+   4.7 Dificuldades
+   O enunciado nao define o formato das bases nem o desvio padrao usado;
+   as escolhas feitas estao descritas acima. A liberacao de memoria em
+   caso de erro no meio da leitura foi resolvida zerando as posicoes novas
+   ao ampliar o vetor de amostras, o que permite liberar a base sempre pela
+   mesma funcao.
+
+5. BUGS CONHECIDOS
+   Nenhum conhecido.
+
+6. OUTRAS INFORMACOES
+   A mensagem final usa "Acuracia" com acento agudo no "a", como
+   no enunciado.
