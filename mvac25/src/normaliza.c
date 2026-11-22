@@ -4,11 +4,9 @@
 #include "normaliza.h"
 
 /* Funcao que calcula deslocamento e escala do atributo j na base. */
-typedef void (*CalculaParametros)(const Base *base, int j,
-                                  double *deslocamento, double *escala);
+typedef void (*CalculaParametros)(const Base *base, int j, double *deslocamento, double *escala);
 
-static void parametrosMinMax(const Base *base, int j,
-                             double *deslocamento, double *escala)
+static void parametrosMinMax(const Base *base, int j, double *deslocamento, double *escala)
 {
     double menor = amostraDaBase(base, 0)[j];
     double maior = menor;
@@ -26,8 +24,7 @@ static void parametrosMinMax(const Base *base, int j,
 }
 
 /* O desvio padrao e o populacional (divisao por N, nao por N - 1). */
-static void parametrosZScore(const Base *base, int j,
-                             double *deslocamento, double *escala)
+static void parametrosZScore(const Base *base, int j, double *deslocamento, double *escala)
 {
     double soma = 0.0;
     for (int i = 0; i < base->n_amostras; i++)
@@ -46,8 +43,7 @@ static void parametrosZScore(const Base *base, int j,
 
 Normalizador *criaNormalizador(const Base *treino, Metodo metodo)
 {
-    CalculaParametros calcula = (metodo == MIN_MAX) ? parametrosMinMax
-                                                    : parametrosZScore;
+    CalculaParametros calcula = (metodo == MIN_MAX) ? parametrosMinMax : parametrosZScore;
 
     Normalizador *normalizador = malloc(sizeof *normalizador);
     if (normalizador == NULL)
@@ -76,8 +72,7 @@ void normaliza(const Normalizador *normalizador, Base *base)
             if (normalizador->escala[j] == 0.0)
                 vetor[j] = 0.0;
             else
-                vetor[j] = (vetor[j] - normalizador->deslocamento[j])
-                           / normalizador->escala[j];
+                vetor[j] = (vetor[j] - normalizador->deslocamento[j]) / normalizador->escala[j];
         }
     }
 }

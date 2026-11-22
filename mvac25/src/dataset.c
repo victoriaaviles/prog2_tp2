@@ -22,8 +22,7 @@ static int contaCampos(const char *linha)
         return -1;
 
     int total = 0;
-    for (char *campo = strtok(copia, SEPARADORES); campo != NULL;
-         campo = strtok(NULL, SEPARADORES))
+    for (char *campo = strtok(copia, SEPARADORES); campo != NULL; campo = strtok(NULL, SEPARADORES))
         total++;
 
     free(copia);
@@ -44,8 +43,7 @@ static int ampliaBase(Base *base, int *capacidade)
      * mesmo se a leitura for interrompida no meio de uma amostra. */
     memset(&amostras[*capacidade], 0, (size_t)(nova - *capacidade) * sizeof *amostras);
 
-    double *valores = realloc(base->valores,
-                              (size_t)nova * (size_t)base->n_atributos * sizeof *valores);
+    double *valores = realloc(base->valores, (size_t)nova * (size_t)base->n_atributos * sizeof *valores);
     if (valores == NULL)
         return 0;
     base->valores = valores;

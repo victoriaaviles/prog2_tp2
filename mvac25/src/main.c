@@ -80,8 +80,7 @@ static int leOpcoes(int argc, char **argv, Opcoes *opcoes)
         }
     }
 
-    if (opcoes->arquivoTreino == NULL || opcoes->arquivoTeste == NULL
-        || opcoes->k == 0 || optind != argc) {
+    if (opcoes->arquivoTreino == NULL || opcoes->arquivoTeste == NULL || opcoes->k == 0 || optind != argc) {
         fprintf(stderr, "Erro: -k, -t e -v sao obrigatorios\n");
         return 0;
     }
